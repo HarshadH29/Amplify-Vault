@@ -1,70 +1,136 @@
-# Getting Started with Create React App
+# AmplifyVault - Cloud Backup System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+AmplifyVault is a cloud-based backup system built with **React**, **AWS Amplify**, and **Amazon S3**. It allows users to securely upload, manage, and restore files from anywhere, with authentication and quota management.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **User Authentication** (AWS Cognito via Amplify)
+- **File Upload** (Single & Multiple)
+- **Drag-and-Drop Upload**
+- **File Listing with Search**
+- **Download & Delete Files**
+- **Quota/Usage Display**
+- **Confirmation Dialog for Delete**
+- **Responsive UI**
+- **Cloud Storage (Amazon S3)**
+- **Secure Access (per-user folders)**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js & npm
+- AWS Account
+- Amplify CLI (`npm install -g @aws-amplify/cli`)
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 1. Clone the Repository
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```sh
+git clone https://github.com/HarshadH29/Amplify-Vault.git
+cd Amplify-Vault
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+### 2. Install Dependencies
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```sh
+npm install
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 3. Configure Amplify
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```sh
+amplify init
+```
+- Choose your AWS profile and region.
 
-## Learn More
+#### Add Authentication
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```sh
+amplify add auth
+```
+- Choose default configuration.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Add Storage (S3)
 
-### Code Splitting
+```sh
+amplify add storage
+```
+- Content: "User files"
+- Auth/Guest access: "Auth users only"
+- Permissions: "create/update/read/delete"
+- Prefix: "per-user"
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### Push Resources
 
-### Analyzing the Bundle Size
+```sh
+amplify push
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+### 4. Run Locally
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```sh
+npm start
+```
+App runs at [http://localhost:3000](http://localhost:3000)
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Hosting
 
-### Deployment
+You can host the app using **AWS Amplify Hosting**:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+1. Push your code to GitHub.
+2. Go to AWS Amplify Console → Host web app.
+3. Connect your repo and deploy.
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Usage
+
+- **Sign Up / Login**: Register with your email.
+- **Upload Files**: Drag-and-drop or select files to upload.
+- **View Files**: See your uploaded files, search, download, or delete.
+- **Quota**: See your storage usage bar.
+- **Delete**: Confirm before deleting any file.
+
+---
+
+## Security
+
+- Each user's files are stored in their own S3 folder.
+- Only authenticated users can access their files.
+- All operations use secure AWS Amplify APIs.
+
+---
+
+## Enhancements
+
+- Email notifications (backup completion, quota warning)
+- File versioning & restore
+- Scheduled backups
+- Sharing & collaboration
+- Mobile app support
+
+---
+
+## License
+
+MIT
+
+---
+
+## Support
+
+For issues or feature requests, open a GitHub issue or contact the
