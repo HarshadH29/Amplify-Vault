@@ -1,11 +1,20 @@
 import { Amplify } from "aws-amplify";
 import "./App.css";
+//authenticator is react component that provide ready to use sign in & sign out UI
 import { withAuthenticator } from "@aws-amplify/ui-react";
+//import default style for Amplify UI components
 import "@aws-amplify/ui-react/styles.css";
+//AWS s3 storage imports
 import { uploadData, list, getUrl, remove } from "aws-amplify/storage";
+//AWS service configuration imports genrated by Amplify CLI
 import awsExports from "./aws-exports";
 import { useState, useEffect, useCallback } from "react";
+// GraphQL imports
+import { GraphQLAPI, graphqlOperation } from "@aws-amplify/api-graphql";
+import { createUser } from "./graphql/mutations";
+import { getUser } from "./graphql/queries";
 
+// Configure Amplify library with setting of aws-exports.js file
 Amplify.configure(awsExports);
 
 function App({ signOut, user }) {
@@ -16,10 +25,35 @@ function App({ signOut, user }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [totalUsage, setTotalUsage] = useState(0);
   const [activeSection, setActiveSection] = useState("home");
-  const [deletingKey, setDeletingKey] = useState(null); // Add this state
+  const [deletingKey, setDeletingKey] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState({ show: false, key: null, name: "" });
 
   const USER_QUOTA = 5 * 1024 * 1024 * 1024; // 5GB quota
+
+  // Store user record in DynamoDB if not exists
+  useEffect(() => {
+    const storeUserRecord = async () => {
+      try {
+        // Check if user already exists
+        const result = await GraphQLAPI.graphql(graphqlOperation(getUser, { id: user.attributes.sub }));
+        if (!result.data.getUser) {
+          await GraphQLAPI.graphql(graphqlOperation(createUser, {
+            input: {
+              id: user.attributes.sub,
+              username: user.username,
+              email: user.attributes.email,
+              createdAt: new Date().toISOString()
+            }
+          }));
+        }
+      } catch (error) {
+        // Ignore if already exists or error
+      }
+    };
+    if (user && user.username && user.attributes && user.attributes.email) {
+      storeUserRecord();
+    }
+  }, [user]);
 
   const fetchFiles = useCallback(async () => {
     try {
@@ -84,7 +118,6 @@ function App({ signOut, user }) {
     await fetchFiles();
   };
 
-
   const handleDeleteClick = (key, name) => {
     setConfirmDelete({ show: true, key, name });
   };
@@ -139,7 +172,9 @@ function App({ signOut, user }) {
   // --- NAVBAR ---
   const Navbar = () => (
     <nav className="navbar">
-      <div className="nav-logo" onClick={() => setActiveSection("home")}>AmplifyVault</div>
+      <div className="nav-logo" onClick={() => setActiveSection("home")}>
+        <b style={{ color: "#1976d2" }}>AmplifyVault</b>
+      </div>
       <div className="nav-links">
         <button
           className={`nav-btn${activeSection === "home" ? " active" : ""}`}
@@ -183,7 +218,7 @@ function App({ signOut, user }) {
               <p>
                 Welcome to <b style={{ color: "#1976d2" }}>AmplifyVault!!!</b>
               </p>
-              <p>"Secure every byte, amplify your peace of mind."</p>  
+              <p>"Secure every byte, amplify your peace of mind."</p>
             </>
           )}
 
@@ -280,6 +315,7 @@ function App({ signOut, user }) {
                 ))}
               </ul>
               {filteredFiles.length === 0 && <p>No matching files found.</p>}
+              {/* Show delete status message at the bottom */}
               {fileStatus && fileStatus.startsWith("🗑️ Deleted:") && (
                 <p className="status" style={{ marginTop: "1.5rem" }}>{fileStatus}</p>
               )}
